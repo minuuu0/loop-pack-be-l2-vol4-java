@@ -2,27 +2,18 @@ package com.loopers.interfaces.api.product;
 
 import com.loopers.application.product.ProductInfo;
 
-public class ProductV1Dto {
-    public record CreateProductRequest(
-        String name,
-        String description,
-        Long price,
-        Integer stock
-    ) {}
+import java.math.BigDecimal;
 
-    public record UpdateProductRequest(
-        String name,
-        String description,
-        Long price,
-        Integer stock
-    ) {}
+public class ProductV1Dto {
 
     public record ProductResponse(
         Long id,
         String name,
         String description,
-        Long price,
-        Integer stock
+        BigDecimal price,
+        long likeCount,
+        Long brandId,
+        boolean available
     ) {
         public static ProductResponse from(ProductInfo info) {
             return new ProductResponse(
@@ -30,7 +21,9 @@ public class ProductV1Dto {
                 info.name(),
                 info.description(),
                 info.price(),
-                info.stock()
+                info.likeCount(),
+                info.brandId(),
+                info.stock() > 0
             );
         }
     }
