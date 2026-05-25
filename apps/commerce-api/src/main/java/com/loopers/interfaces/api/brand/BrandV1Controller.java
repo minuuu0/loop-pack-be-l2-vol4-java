@@ -17,7 +17,7 @@ public class BrandV1Controller implements BrandV1ApiSpec {
 
     @GetMapping("/{brandId}")
     @Override
-    public ApiResponse<BrandV1Dto.BrandResponse> getBrand(
+    public ApiResponse<BrandV1Dto.BrandResponse> getBrand(  // TODO: brandId null검증이 필요한가?
         @PathVariable(value = "brandId") Long brandId
     ) {
         return ApiResponse.success(BrandV1Dto.BrandResponse.from(brandFacade.getBrand(brandId)));
