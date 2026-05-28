@@ -1,6 +1,8 @@
 package com.loopers.application.product;
 
 import com.loopers.application.support.PageResult;
+import com.loopers.domain.brand.Brand;
+import com.loopers.domain.brand.BrandService;
 import com.loopers.domain.product.Product;
 import com.loopers.domain.product.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -12,15 +14,20 @@ import java.util.List;
 @Component
 public class ProductFacade {
     private final ProductService productService;
+    private final BrandService brandService;
 
     public ProductInfo getProduct(Long id) {
         Product product = productService.getProduct(id);
-        return ProductInfo.from(product);
+        Brand brand = brandService.getBrand(product.getBrandId());
+        return ProductInfo.from(product, brand);
     }
 
     public PageResult<ProductInfo> getProducts(Long brandId, String sort, int page, int size) {
         List<ProductInfo> items = productService.getProducts(brandId, sort, page, size).stream()
-            .map(ProductInfo::from)
+            .map(product -> {
+                Brand brand = brandService.getBrand(product.getBrandId());
+                return ProductInfo.from(product, brand);
+            })
             .toList();
         long totalElements = productService.countProducts(brandId);
         return new PageResult<>(items, page, size, totalElements);

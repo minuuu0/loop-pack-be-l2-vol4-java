@@ -14,7 +14,7 @@ public class ProductV1Dto {
         String description,
         BigDecimal price,
         long likeCount,
-        Long brandId,
+        BrandResponse brand,
         boolean available
     ) {
         public static ProductResponse from(ProductInfo info) {
@@ -24,9 +24,15 @@ public class ProductV1Dto {
                 info.description(),
                 info.price(),
                 info.likeCount(),
-                info.brandId(),
+                BrandResponse.from(info.brand()),
                 info.stock() > 0
             );
+        }
+    }
+
+    public record BrandResponse(Long id, String name, String description) {
+        public static BrandResponse from(ProductInfo.BrandSummary brand) {
+            return new BrandResponse(brand.id(), brand.name(), brand.description());
         }
     }
 
