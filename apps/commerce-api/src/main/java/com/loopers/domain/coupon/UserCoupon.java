@@ -10,6 +10,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * 유저에게 발급된 쿠폰 한 장. 어떤 템플릿(couponId)을 누가(userId) 가졌고 상태가 무엇인지를 가진다.
  * 발급 시점에는 AVAILABLE 로 시작한다.
@@ -35,5 +37,19 @@ public class UserCoupon extends BaseEntity {
         this.userId = userId;
         this.couponId = couponId;
         this.status = CouponStatus.AVAILABLE;
+    }
+
+    /**
+     * 조회 시점의 노출 상태를 계산한다. 저장된 status(AVAILABLE/USED)와 템플릿 만료일을 조합한다.
+     * EXPIRED 는 저장하지 않고 여기서 파생한다.
+     */
+    public CouponStatus resolveStatus(LocalDateTime expiredAt, LocalDateTime now) {
+        if (status == CouponStatus.USED) {
+            return CouponStatus.USED;
+        }
+        if (now.isAfter(expiredAt)) {
+            return CouponStatus.EXPIRED;
+        }
+        return CouponStatus.AVAILABLE;
     }
 }
