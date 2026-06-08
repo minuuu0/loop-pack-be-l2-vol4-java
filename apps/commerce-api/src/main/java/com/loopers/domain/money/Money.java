@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Money {
 
+    public static final Money ZERO = new Money(BigDecimal.ZERO);
+
     private BigDecimal amount;
 
     public Money(BigDecimal amount) {

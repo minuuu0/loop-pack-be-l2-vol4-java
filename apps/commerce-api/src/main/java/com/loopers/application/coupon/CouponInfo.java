@@ -1,35 +1,33 @@
 package com.loopers.application.coupon;
 
 import com.loopers.domain.coupon.Coupon;
-import com.loopers.domain.coupon.CouponStatus;
 import com.loopers.domain.coupon.CouponType;
 import com.loopers.domain.coupon.Discount;
-import com.loopers.domain.coupon.UserCoupon;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-public record UserCouponInfo(
+/**
+ * 쿠폰 템플릿 뷰 DTO. admin 화면에서 템플릿 자체를 보여줄 때 쓴다.
+ * (UserCouponInfo 와 달리 userId/status 가 없다 — 발급분이 아니라 정책 원본이므로)
+ */
+public record CouponInfo(
     Long id,
-    Long couponId,
     String name,
     CouponType type,
     long value,
     BigDecimal minOrderAmount,
-    LocalDateTime expiredAt,
-    CouponStatus status
+    LocalDateTime expiredAt
 ) {
-    public static UserCouponInfo of(UserCoupon userCoupon, Coupon coupon, CouponStatus displayStatus) {
+    public static CouponInfo from(Coupon coupon) {
         Discount discount = coupon.getDiscount();
-        return new UserCouponInfo(
-            userCoupon.getId(),
+        return new CouponInfo(
             coupon.getId(),
             coupon.getName(),
             discount.getType(),
             discount.getValue(),
             coupon.getMinOrderAmount().getAmount(),
-            coupon.getExpiredAt(),
-            displayStatus
+            coupon.getExpiredAt()
         );
     }
 }

@@ -55,4 +55,12 @@ public class Coupon extends BaseEntity {
             throw new CoreException(ErrorType.BAD_REQUEST, "만료일은 비어있을 수 없습니다.");
         }
     }
+
+    public void update(String name, Discount discount, Money minOrderAmount, LocalDateTime expiredAt) {
+        validate(name, expiredAt);
+        this.name = name;
+        this.discount = discount;
+        this.minOrderAmount = minOrderAmount;
+        this.expiredAt = expiredAt;
+    }
 }
