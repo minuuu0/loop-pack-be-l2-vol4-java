@@ -1,10 +1,13 @@
 package com.loopers.domain.coupon;
 
+import com.loopers.domain.money.Money;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+
+import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,6 +67,52 @@ class DiscountTest {
 
             // assert
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+    }
+
+    @DisplayName("할인을 적용할 때, ")
+    @Nested
+    class Apply {
+        @DisplayName("정액(FIXED) 쿠폰이면, 할인값 그대로를 할인 금액으로 반환한다.")
+        @Test
+        void returnsFixedValue_whenTypeIsFixed() {
+            // arrange
+            Discount discount = new Discount(CouponType.FIXED, 5000L);
+            Money orderAmount = new Money(BigDecimal.valueOf(20000));
+
+            // act
+            Money discountAmount = discount.apply(orderAmount);
+
+            // assert
+            assertThat(discountAmount.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(5000));
+        }
+
+        @DisplayName("정률(RATE) 쿠폰이면, 주문 금액의 비율만큼 소수점 이하를 절사한 할인 금액을 반환한다.")
+        @Test
+        void returnsFlooredRateAmount_whenTypeIsRate() {
+            // arrange
+            Discount discount = new Discount(CouponType.RATE, 10L);
+            Money orderAmount = new Money(BigDecimal.valueOf(9999));
+
+            // act
+            Money discountAmount = discount.apply(orderAmount);
+
+            // assert
+            assertThat(discountAmount.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(999));
+        }
+
+        @DisplayName("정액(FIXED) 할인값이 주문 금액보다 크면, 할인 금액은 주문 금액으로 제한된다.")
+        @Test
+        void capsDiscountAtOrderAmount_whenFixedValueExceedsOrderAmount() {
+            // arrange
+            Discount discount = new Discount(CouponType.FIXED, 5000L);
+            Money orderAmount = new Money(BigDecimal.valueOf(3000));
+
+            // act
+            Money discountAmount = discount.apply(orderAmount);
+
+            // assert
+            assertThat(discountAmount.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(3000));
         }
     }
 }

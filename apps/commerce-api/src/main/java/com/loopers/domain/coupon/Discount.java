@@ -1,5 +1,6 @@
 package com.loopers.domain.coupon;
 
+import com.loopers.domain.money.Money;
 import com.loopers.support.error.CoreException;
 import com.loopers.support.error.ErrorType;
 import jakarta.persistence.Column;
@@ -10,6 +11,9 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 /**
  * 할인 정책 값 객체. 할인 방식(type)과 할인값(value)을 묶어 불변식을 보장한다.
@@ -46,5 +50,15 @@ public class Discount {
         if (type == CouponType.RATE && value > MAX_RATE) {
             throw new CoreException(ErrorType.BAD_REQUEST, "정률 할인은 100%를 넘을 수 없습니다.");
         }
+    }
+
+    public Money apply(Money orderAmount) {
+        BigDecimal discountAmount = switch (type) {
+            case FIXED -> BigDecimal.valueOf(value);
+            case RATE -> orderAmount.getAmount()
+                .multiply(BigDecimal.valueOf(value))
+                .divide(BigDecimal.valueOf(100), 0, RoundingMode.DOWN);
+        };
+        return new Money(discountAmount.min(orderAmount.getAmount()));
     }
 }
