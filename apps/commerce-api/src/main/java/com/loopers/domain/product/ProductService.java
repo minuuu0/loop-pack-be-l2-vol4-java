@@ -23,6 +23,19 @@ public class ProductService {
     }
 
     /**
+     * 좋아요 수 원자적 증감. 모든 동시 요청이 빠짐없이 반영되어야 하므로 한 문장 UPDATE 로 처리한다.
+     */
+    @Transactional
+    public void increaseLikeCount(Long productId) {
+        productRepository.increaseLikeCount(productId);
+    }
+
+    @Transactional
+    public void decreaseLikeCount(Long productId) {
+        productRepository.decreaseLikeCount(productId);
+    }
+
+    /**
      * 상품 행에 비관적 락을 걸어 조회한다. 재고 차감처럼 전원 차례 처리가 필요한 경로 전용.
      */
     @Transactional

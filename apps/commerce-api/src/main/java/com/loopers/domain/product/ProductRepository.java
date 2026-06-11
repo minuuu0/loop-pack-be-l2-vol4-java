@@ -8,4 +8,6 @@ public interface ProductRepository {
     List<Product> findAllByIdForUpdate(List<Long> ids);
     List<Product> findAll(Long brandId, ProductSort sort, int page, int size);
     long count(Long brandId);
+    void increaseLikeCount(Long id);
+    void decreaseLikeCount(Long id);
 }
