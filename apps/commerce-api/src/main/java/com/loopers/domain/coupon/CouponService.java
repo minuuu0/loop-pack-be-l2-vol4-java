@@ -31,6 +31,22 @@ public class CouponService {
         return userCouponRepository.save(userCoupon);
     }
 
+    /**
+     * 발급 쿠폰을 사용 처리하고 할인 금액을 반환한다.
+     * 존재하지 않거나 타 유저 소유인 쿠폰은 동일하게 NOT_FOUND 로 응답한다(타인 리소스 존재 비노출).
+     */
+    @Transactional
+    public Money use(Long userId, Long userCouponId, Money orderAmount) {
+        UserCoupon userCoupon = userCouponRepository.findById(userCouponId)
+            .filter(issued -> issued.getUserId().equals(userId))
+            .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "[userCouponId = " + userCouponId + "] 쿠폰을 찾을 수 없습니다."));
+        Coupon coupon = getCoupon(userCoupon.getCouponId());
+        Money discountAmount = coupon.discountFor(orderAmount);
+        userCoupon.use(coupon.getExpiredAt(), LocalDateTime.now());
+        userCouponRepository.save(userCoupon);
+        return discountAmount;
+    }
+
     @Transactional
     public Coupon update(Long couponId, String name, Discount discount, Money minOrderAmount, LocalDateTime expiredAt) {
         Coupon coupon = getCoupon(couponId);

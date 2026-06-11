@@ -8,6 +8,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -17,6 +18,11 @@ public class UserCouponRepositoryImpl implements UserCouponRepository {
     @Override
     public UserCoupon save(UserCoupon userCoupon) {
         return userCouponJpaRepository.save(userCoupon);
+    }
+
+    @Override
+    public Optional<UserCoupon> findById(Long id) {
+        return userCouponJpaRepository.findById(id);
     }
 
     @Override

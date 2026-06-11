@@ -63,4 +63,11 @@ public class Coupon extends BaseEntity {
         this.minOrderAmount = minOrderAmount;
         this.expiredAt = expiredAt;
     }
+
+    public Money discountFor(Money orderAmount) {
+        if (minOrderAmount != null && orderAmount.isLessThan(minOrderAmount)) {
+            throw new CoreException(ErrorType.BAD_REQUEST, "최소 주문 금액을 충족하지 않습니다.");
+        }
+        return discount.apply(orderAmount);
+    }
 }

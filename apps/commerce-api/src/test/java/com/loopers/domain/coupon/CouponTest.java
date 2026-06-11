@@ -57,6 +57,53 @@ class CouponTest {
         }
     }
 
+    @DisplayName("주문 금액의 할인 금액을 계산할 때, ")
+    @Nested
+    class DiscountFor {
+        @DisplayName("최소 주문 금액 이상이면, 할인 정책에 따른 할인 금액을 반환한다.")
+        @Test
+        void returnsDiscountAmount_whenOrderAmountMeetsMinimum() {
+            // arrange
+            Coupon coupon = new Coupon("신규 10% 할인", new Discount(CouponType.RATE, 10L),
+                new Money(BigDecimal.valueOf(10000)), EXPIRED_AT);
+
+            // act
+            Money discountAmount = coupon.discountFor(new Money(BigDecimal.valueOf(20000)));
+
+            // assert
+            assertThat(discountAmount.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(2000));
+        }
+
+        @DisplayName("최소 주문 금액 미달이면, BAD_REQUEST 예외가 발생한다.")
+        @Test
+        void throwsBadRequest_whenOrderAmountIsBelowMinimum() {
+            // arrange
+            Coupon coupon = new Coupon("신규 10% 할인", new Discount(CouponType.RATE, 10L),
+                new Money(BigDecimal.valueOf(10000)), EXPIRED_AT);
+
+            // act
+            CoreException result = assertThrows(CoreException.class, () ->
+                coupon.discountFor(new Money(BigDecimal.valueOf(9999))));
+
+            // assert
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
+        @DisplayName("최소 주문 금액 조건이 없으면, 검증 없이 할인 금액을 반환한다.")
+        @Test
+        void returnsDiscountAmount_whenMinOrderAmountIsAbsent() {
+            // arrange
+            Coupon coupon = new Coupon("천원 할인", new Discount(CouponType.FIXED, 1000L),
+                null, EXPIRED_AT);
+
+            // act
+            Money discountAmount = coupon.discountFor(new Money(BigDecimal.valueOf(5000)));
+
+            // assert
+            assertThat(discountAmount.getAmount()).isEqualByComparingTo(BigDecimal.valueOf(1000));
+        }
+    }
+
     @DisplayName("쿠폰 템플릿을 수정할 때, ")
     @Nested
     class Update {

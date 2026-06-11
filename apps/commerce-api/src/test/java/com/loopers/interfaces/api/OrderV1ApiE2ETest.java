@@ -105,7 +105,7 @@ class OrderV1ApiE2ETest {
             Product product = saveProduct(10);
             HttpHeaders headers = authHeaders("minwoo01", "Passw0rd!");
             OrderV1Dto.PlaceOrderRequest request = new OrderV1Dto.PlaceOrderRequest(
-                List.of(new OrderV1Dto.OrderLineRequest(product.getId(), 3))
+                List.of(new OrderV1Dto.OrderLineRequest(product.getId(), 3)), null
             );
 
             // act
@@ -136,7 +136,7 @@ class OrderV1ApiE2ETest {
             Product product = saveProduct(5);
             HttpHeaders headers = authHeaders("minwoo01", "Passw0rd!");
             OrderV1Dto.PlaceOrderRequest request = new OrderV1Dto.PlaceOrderRequest(
-                List.of(new OrderV1Dto.OrderLineRequest(product.getId(), 10))
+                List.of(new OrderV1Dto.OrderLineRequest(product.getId(), 10)), null
             );
 
             // act
@@ -161,7 +161,7 @@ class OrderV1ApiE2ETest {
             signup("minwoo01", "Passw0rd!");
             HttpHeaders headers = authHeaders("minwoo01", "Passw0rd!");
             OrderV1Dto.PlaceOrderRequest request = new OrderV1Dto.PlaceOrderRequest(
-                List.of(new OrderV1Dto.OrderLineRequest(999L, 1))
+                List.of(new OrderV1Dto.OrderLineRequest(999L, 1)), null
             );
 
             // act
@@ -181,7 +181,7 @@ class OrderV1ApiE2ETest {
             // arrange
             Product product = saveProduct(10);
             OrderV1Dto.PlaceOrderRequest request = new OrderV1Dto.PlaceOrderRequest(
-                List.of(new OrderV1Dto.OrderLineRequest(product.getId(), 1))
+                List.of(new OrderV1Dto.OrderLineRequest(product.getId(), 1)), null
             );
 
             // act
