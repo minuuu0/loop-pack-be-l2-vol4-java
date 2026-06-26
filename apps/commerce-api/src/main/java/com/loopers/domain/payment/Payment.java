@@ -71,4 +71,23 @@ public class Payment extends BaseEntity {
             throw new CoreException(ErrorType.BAD_REQUEST, "결제 상태는 필수입니다.");
         }
     }
+
+    /** 결제 성공 확정. 결제 대기(PENDING) 상태에서만 가능 — 콜백/폴링 중복에도 한 번만 전이된다. */
+    public void markSuccess() {
+        requirePending();
+        this.status = PaymentStatus.SUCCESS;
+    }
+
+    /** 결제 실패 확정. */
+    public void markFailed(String reason) {
+        requirePending();
+        this.status = PaymentStatus.FAILED;
+        this.reason = reason;
+    }
+
+    private void requirePending() {
+        if (this.status != PaymentStatus.PENDING) {
+            throw new CoreException(ErrorType.CONFLICT, "결제 대기 상태의 결제만 확정할 수 있습니다. 현재 상태: " + this.status);
+        }
+    }
 }
