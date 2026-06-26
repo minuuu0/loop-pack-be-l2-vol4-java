@@ -7,6 +7,9 @@ public interface PaymentGateway {
 
     PaymentResult requestPayment(PaymentRequest request);
 
+    /** PG에 거래의 현재 상태를 직접 조회한다. 콜백 유실 시 폴링으로 정합성을 보정하는 데 쓴다. */
+    PaymentResult getTransaction(String userId, String transactionKey);
+
     record PaymentRequest(
         String userId,
         String orderId,

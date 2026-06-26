@@ -49,6 +49,22 @@ public class PgPaymentGateway implements PaymentGateway {
         return new PaymentResult(null, PaymentStatus.PENDING, "결제 결과 미확정: " + t.getMessage());
     }
 
+    @Retry(name = "pgPayment", fallbackMethod = "getTransactionFallback")
+    @Override
+    public PaymentResult getTransaction(String userId, String transactionKey) {
+        PgPaymentV1Dto.TransactionResponse transaction = pgPaymentClient.getTransaction(userId, transactionKey).data();
+        return new PaymentResult(
+            transaction.transactionKey(),
+            toPaymentStatus(transaction.status()),
+            transaction.reason()
+        );
+    }
+
+    /** 상태 조회가 끝내 실패하면 PENDING 으로 둬서 confirm 이 no-op 되게 한다 — 다음 폴링 주기에 다시 시도한다. */
+    private PaymentResult getTransactionFallback(String userId, String transactionKey, Throwable t) {
+        return new PaymentResult(transactionKey, PaymentStatus.PENDING, "상태 조회 실패: " + t.getMessage());
+    }
+
     private PaymentStatus toPaymentStatus(PgPaymentV1Dto.TransactionStatus status) {
         return switch (status) {
             case PENDING -> PaymentStatus.PENDING;
